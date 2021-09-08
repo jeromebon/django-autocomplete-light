@@ -1,7 +1,119 @@
+3.8.2 Upgrade to select2 4.0.13
+
+3.8.1 BUGFIX RELEASE
+
+    Fix #1175: Rebuild js
+
+3.8.0
+
+    A LOT of fixes, but they come at a price ...
+
+    BACKWARD COMPATIBILITY BREAK:
+    You now MUST register your custom init functions as per
+    https://django-autocomplete-light.readthedocs.io/en/master/tutorial.html#overriding-javascript-code
+
+    Changes:
+
+    #1171 data-html and object creation bugfix by @syserr0r
+    #1182 fix production with select2 upgrade by @MarkRunWu
+    #1169 implement search_fields and split_words by @MuckRock
+    #1145 fix post method parameters by @erdnax123
+    #1162 JS load order issues by @danielmorell
+    #1157 jQuery loading by @danielmorell
+    #1162 fix by @danielmorell this one introduces the breaking changes
+    #1129 fix rtfd autobuild by @jpic
+    #1158 remove calculated width by @nad2000
+    #1159 Fix UUID for GFK models by @sayeghr
+    #1138 Replace DOMNodeInserted with MutationObserver by @CristopherH95
+    #1144 doc typo fix by @timgates42
+    Flake8, Tox, Travis CI, tests ... fix by @jpic
+
+3.7.0 & 3.6.0
+
+    Well, Pypi won't let me upload there, it says:
+
+        HTTPError: 400 Client Error: This filename has already been used, use a different version. See https://pypi.org/help/#file-name-reuse for more information. for url: https://upload.pypi.org/legacy/
+
+    But I only see 3.6.0.dev0 and 3.6.0.dev1 and 3.7.0.dev0, I suppose I should
+    have done pre-releases on 3.6.dev0 and 3.7.dev0.
+
+    Anyway, it lets me upload on 3.8.0, one of the last 3.x releases !
+
+    But don't worry, 4.0 will not break anything, it will merely add a new
+    autocomplete script for people who want out of select2 or want something
+    more like what we had in DAL 1 & 2, it's here:
+
+    Demo: https://oss.yourlabs.me/autocomplete-light/
+    Source: https://yourlabs.io/oss/autocomplete-light
+
+    For those who remember, this solves *exactly* the same problems that
+    jquery-autocomplete-light did, except it's a lightweight StencilJS
+    WebComponent now.
+
+3.6.0
+
+    This release actually never hit Pypi.
+
+3.5.1
+
+    jquery.js was still loaded by the widget, fixed by @timthelion
+
+3.5.0
+
+    BACKWARD COMPATIBILITY BREAKS:
+    - jquery.js has been **removed** from widget.media, this means that you are
+      now responsible for ensuring that jquery is loaded in your page prior to
+      displaying the form (form.media).
+    - trailing dash was replaced by underscore in forward conf, ie.
+      dal-forward-conf-for-id_test becomes dal-forward-conf-for_id_test
+
+    #1115: Compatibility with Django 3.0 by Alexandr Artemyev @mogost
+    #1079: Fixed access to $.fn.select2 by David @dwasyl
+    #1118: Highlight select field with error to match Django style by @tchatow
+    #1099: django-nested-admin forwarded field fix by @akshenc
+
+    Also, tests now run fine on Travis thanks to @jorrit-wehelp
+
+3.4.1 Fix #1108: i18n path (thanks @philgyford for report)
+
+3.4.0 Python 2 and Django < 2.0 support
+
+3.3.4 re-release without dirty source
+
+3.3.3 django < 2.0 support with dal_static contributed by @andybak
+
+3.3.2 django.contrib.admin fix static files by @coredumperror
+
+3.3.1
+
+  - Fixed a bug in the way jquery.init.js was being used by @coredumperror
+  - Set select2 container CSS class to :all: @hbielenia
+  - Added missing renderer parameter to render method for django 2.1 @monim67
+  - Fix ImportError with SELECT2_TRANSLATIONS in Django 1.x @hugorodgerbrown
+  - Forward argument should always be a tuple @jihoon796
+  - Fixed exception thrown from Select2QuerySEtView when paginate_by is set
+    @coredumperror
+
+3.3.0
+
+    - use admin statics
+    - #981: create option behaviour
+    - #995: automatically generated views for generic foreign key fields
+    - Getting placeholder and minimumInputLength from dal select
+    - #1017: Initial migrations and database
+    - Turkish translation
+    - Added support for forwarded fields to Select2GenericForeignKeyModelField
+
+3.3.0-rc6
+
+    #959
+
 3.3.0-rc5
+
     #895: Self() and JavaScript() forward features
 
 3.3.0-rc4
+
     #843: Forward logic refactored. Specifications for types of forwarded values.
 
 3.3.0-rc3

@@ -22,7 +22,7 @@ class Field(Forward):
     The type of the forwarded value from the field is either string, list of
     strings or boolean.
 
-    The following rules are used to deduce forwarded type.
+    The following rules are used to deduce the forwarded type.
 
      - If there is only one field in the form or subform with name ``src``
     and this field is a checkbox without ``value`` HTML-attribute,
@@ -126,6 +126,7 @@ class JavaScript(Forward):
     type = "javascript"
 
     def __init__(self, handler, dst=None):
+        """Initialize Javascript class."""
         self.handler = handler
         self.dst = dst
 
@@ -151,6 +152,7 @@ class Self(Forward):
     forwarded dictionary. If this value is ``None``, then the key is
     ``self``.
     """
+
     type = "self"
 
     def __init__(self, dst=None):

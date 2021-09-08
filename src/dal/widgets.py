@@ -11,8 +11,9 @@ try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
-from django.utils import six
 from django.utils.safestring import mark_safe
+
+import six
 
 
 class WidgetMixin(object):
@@ -21,7 +22,7 @@ class WidgetMixin(object):
     .. py:attribute:: url
 
         Absolute URL to the autocomplete view for the widget. It can be set to
-        a a URL name, in which case it will be reversed when the attribute is
+        a URL name, in which case it will be reversed when the attribute is
         accessed.
 
     .. py:attribute:: forward
@@ -32,10 +33,10 @@ class WidgetMixin(object):
         Items of the list must be one of the following:
          - string (e. g. "some_field"): forward a value from
            the field with named "some_field";
-         - `dal.forward.Field("some_field"): the same as above;
-         - `dal.forward.Field("some_field", "dst_field"): forward a value from
+         - ``dal.forward.Field("some_field")``: the same as above;
+         - ``dal.forward.Field("some_field", "dst_field")``: forward a value from
            the field with named "some_field" as "dst_field";
-         - `dal.forward.Const("some_value", "dst_field"): forward a constant
+         - ``dal.forward.Const("some_value", "dst_field")``: forward a constant
            value "some_value" as "dst_field".
 
     .. py:attribute:: autocomplete_function
@@ -88,7 +89,7 @@ class WidgetMixin(object):
         if self.forward:
             return \
                 '<div style="display:none" class="dal-forward-conf" ' + \
-                'id="dal-forward-conf-for-{id}"'.format(id=id) + \
+                'id="dal-forward-conf-for_{id}"'.format(id=id) + \
                 '>' \
                 '<script type="text/dal-forward-conf">' + \
                 json.dumps(
@@ -145,7 +146,7 @@ class WidgetMixin(object):
         self.choices = all_choices
         return result
 
-    def render(self, name, value, attrs=None, **kwargs):
+    def render(self, name, value, attrs=None, renderer=None, **kwargs):
         """Call Django render together with `render_forward_conf`."""
         widget = super(WidgetMixin, self).render(name, value, attrs, **kwargs)
         try:

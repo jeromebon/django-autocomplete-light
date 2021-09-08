@@ -10,7 +10,7 @@
 Features
 --------
 
-- Python 2.7, 3.4, Django 1.8+ support,
+- Python 2.7, 3.4, Django 2.0+ support (Django 1.11 (LTS), is supported until django-autocomplete-light-3.2.10),
 - Django (multiple) choice support,
 - Django (multiple) model choice support,
 - Django generic foreign key support (through django-querysetsequence),
@@ -19,11 +19,11 @@ Features
 - Multiple widget support: select2.js, easy to add more.
 - Creating choices that don't exist in the autocomplete,
 - Offering choices that depend on other fields in the form, in an elegant and
-  innovant way,
+  innovative way,
 - Dynamic widget creation (ie. inlines), supports YOUR custom scripts too,
 - Provides a test API for your awesome autocompletes, to support YOUR custom
   use cases too,
-- A documented, automatically tested example for each use case in test_project.
+- A documented automatically tested example for each use case in test_project.
 
 Upgrading
 ---------
@@ -36,6 +36,9 @@ For v2 users and experts, a `blog post was published with plenty of details
 Resources
 ---------
 
+- `**Live demo** graciously hosted
+  <https://dal--jpic.repl.co/>`_ by `Repl.it
+  <https://repl.it>`_
 - `**Documentation** graciously hosted
   <http://django-autocomplete-light.rtfd.org>`_ by `RTFD
   <http://rtfd.org>`_
@@ -55,5 +58,5 @@ Resources
 - `Continuous integration graciously hosted
   <http://travis-ci.org/yourlabs/django-autocomplete-light>`_ by `Travis-ci
   <http://travis-ci.org>`_
-- `**Online paid support** provided via HackHands
-  <https://hackhands.com/jpic/>`_,
+- `**Paid Support** on codementor
+  <https://www.codementor.io/@jpic>`_

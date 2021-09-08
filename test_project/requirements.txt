@@ -1,7 +1,6 @@
 coverage
 django-extensions
--e git+https://github.com/theatlantic/django-nested-admin.git@4a511db92549d7c17c3499638060f0761dcb414e#egg=nested_admin
--e git+https://github.com/coleifer/django-generic-m2m.git#egg=genericm2m
+django-generic-m2m
 django-gm2m
 django-querysetsequence
 django-taggit
@@ -15,5 +14,5 @@ pytest-cov
 pytest-splinter
 tenacity
 whitenoise
-django-nested-admin
+django-nested-admin>=3.0.21
 django-debug-toolbar

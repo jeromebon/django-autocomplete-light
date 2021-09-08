@@ -6,7 +6,8 @@ try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
-from django.utils import six
+
+import six
 
 from taggit.models import Tag
 
@@ -66,7 +67,7 @@ class TagSelect2TestMixin(object):
                 attrs={
                     'data-autocomplete-light-function': 'select2',
                     'data-autocomplete-light-url': reverse(self.url_name),
-                    'data-autocomplete-light-language': 'en-US',
+                    'data-autocomplete-light-language': 'en',
                     'data-tags': ',',
                     'id': 'id_test',
                 }

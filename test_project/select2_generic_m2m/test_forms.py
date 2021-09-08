@@ -8,9 +8,10 @@ try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
-from django.utils import six
 
 from queryset_sequence import QuerySetSequence
+
+import six
 
 from .forms import TForm
 from .models import TModel

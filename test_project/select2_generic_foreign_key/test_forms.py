@@ -7,9 +7,10 @@ try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
-from django.utils import six
 
 from queryset_sequence import QuerySetSequence
+
+import six
 
 from .forms import TForm
 from .models import TModel, TProxyModel
@@ -68,6 +69,9 @@ class GenericFormTest(test.TestCase):  # noqa
         self.assertFalse(form.is_valid())
 
     def test_initial(self):
+        # this sets the proper widget
+        from . import urls  # noqa
+
         # Create an initial instance with a created relation
         relation = TModel.objects.create(name='relation' + self.id())
         fixture = TModel(name=self.id())
@@ -84,11 +88,20 @@ class GenericFormTest(test.TestCase):  # noqa
             ),
             attrs={
                 'data-autocomplete-light-function': 'select2',
-                'data-autocomplete-light-url': reverse('select2_gfk'),
-                'data-autocomplete-light-language': 'en-US',
+                'data-autocomplete-light-url': reverse('TForm_autocomp_test'),
+                'data-autocomplete-light-language': 'en',
                 'id': 'id_test',
             }
         ).render('test', value=self.get_value(relation))
         result = six.text_type(form['test'].as_widget())
+
+        expected += '''
+        <div class="dal-forward-conf" id="dal-forward-conf-for_id_test"
+        style="display:none">
+        <script type="text/dal-forward-conf">
+        [{"type": "field", "src": "name"}]</script>
+        </div>
+        '''
+
         self.maxDiff = 10000
         self.assertHTMLEqual(result, expected)

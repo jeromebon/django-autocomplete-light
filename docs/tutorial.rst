@@ -18,7 +18,7 @@ Create an autocomplete view
 - Example source code: `test_project/select2_foreign_key
   <https://github.com/yourlabs/django-autocomplete-light/blob/master/test_project/select2_foreign_key/urls.py>`_
 - Live demo: `/select2_foreign_key/test-autocomplete/?q=test
-  <http://dal-yourlabs.rhcloud.com/select2_foreign_key/test-autocomplete/?q=test>`_
+  <http://dal--jpic.repl.co/select2_foreign_key/test-autocomplete/?q=test>`_
 
 The only purpose of the autocomplete view is to serve relevant suggestions for
 the widget to propose to the user. DAL leverages Django's `class based views
@@ -30,9 +30,8 @@ and `Mixins <https://en.wikipedia.org/wiki/Mixin>`_ to for code reuse.
           class-based views in general.
 
 In this tutorial, we'll first learn to make autocompletes backed by a
-:django:term:`QuerySet`. Suppose we have a Country
-:django:term:`Model` which we want to provide a `Select2
-<https://select2.github.io/>`_ autocomplete widget for in a form. If a
+`QuerySet`. Suppose we have a Country `Model` which we want to provide a
+`Select2 <https://select2.github.io/>`_ autocomplete widget for in a form. If a
 users types an "f" it would propose "Fiji", "Finland" and "France", to
 authenticated users only:
 
@@ -50,7 +49,7 @@ The base view for this is :py:class:`~dal_select2.views.Select2QuerySetView`.
     class CountryAutocomplete(autocomplete.Select2QuerySetView):
         def get_queryset(self):
             # Don't forget to filter out results depending on the visitor !
-            if not self.request.user.is_authenticated():
+            if not self.request.user.is_authenticated:
                 return Country.objects.none()
 
             qs = Country.objects.all()
@@ -170,7 +169,7 @@ Passing options to select2
 <https://select2.github.io/>`_ supports a bunch of `options
 <https://select2.github.io/options.html>`_. These options may be
 `set in data-* attributes
-<https://select2.github.io/options.html#data-attributes>`_. For example:
+<https://select2.org/configuration/data-attributes>`_. For example:
 
 .. code-block:: python
 
@@ -220,7 +219,7 @@ Using autocompletes outside the admin
 - Example source code: `test_project/select2_outside_admin
   <https://github.com/yourlabs/django-autocomplete-light/tree/master/test_project/select2_outside_admin>`_,
 - Live demo: `/select2_outside_admin/
-  <http://dal-yourlabs.rhcloud.com/select2_outside_admin/>`_.
+  <http://dal--jpic.repl.co/select2_outside_admin/>`_.
 
 Ensure that jquery is loaded before ``{{ form.media }}``:
 
@@ -278,52 +277,72 @@ Overriding javascript code
 
 We need javascript initialization for the widget both when:
 
-- the page is loaded,
-- a widget is dynamically added, ie. with formsets.
+- The page is loaded.
+- A widget is dynamically added, i.e. with formsets.
 
-This is handled by ``autocomplete.init.js``, which is going to trigger an event
-called ``autocompleteLightInitialize`` on any HTML element with attribute
-``data-autocomplete-light-function`` both on page load and DOM node insertion.
-It also keeps track of initialized elements to prevent double-initialization.
+This is handled by ``autocomplete_light.js``, which is going to trigger an event
+called ``dal-init-function`` on the document when Django Autocomplete Light has
+initialized. At this point you can simply call ``yl.registerFunction()`` to register
+your custom function.
+
+``yl.registerFunction()`` takes two arguments ``name`` and ``func``. The first argument
+``name`` is the name of name the function. It should be the same as the value of your widget
+``autocomplete_function`` property which in turn is the value of the
+``data-autocomplete-light-function`` HTML attribute on your input or select field.
+The second argument ``func`` is the callback function to be run by Django Autocomplete
+Light when it initializes your input autocomplete.
+
+``autocomplete_light.js`` also keeps track of initialized elements to prevent
+double-initialization.
 
 Take ``dal_select2`` for example, it is initialized by
 ``dal_select2/static/autocomplete_light/select2.js`` as such:
 
 .. code-block:: javascript
 
-    $(document).on('autocompleteLightInitialize', '[data-autocomplete-light-function=select2]', function() {
-        // do select2 configuration on $(this)
+    document.addEventListener('dal-init-function', function () {
+        yl.registerFunction( 'select2', function ($, element) {
+            // autocomplete function here
+        });
     })
 
-This example defines a callback that does ``// do select2 configuration on
-$(this)`` when the ``autocompleteLightInitialize`` event is triggered on any
-element with an attribute ``data-autocomplete-light-function`` of value
-``select2``. Select2 Widgets have an :py:attr:`autocomplete_function` of value
-``select2``, and that's rendered as the value of the
-``data-autocomplete-light-function`` attribute.
+This example defines an anonymous function as a callback that will be called when Django
+Autocomplete Light initializes your autocomplete input field. It will also be called when
+any new field is added, such as a inline formset. The function will be called for any
+element with an attribute ``data-autocomplete-light-function`` value that is the same as
+the function name.
+
+When Django Autocomplete Light calls your function two arguments are passed in. The
+first is the ``django.jQuery`` object. This is done since your function may not have
+access to ``django.jQuery`` in the lexical environment when the function was placed into
+memory. This of course causes your function to not have access to jQuery, which may be
+a problem.
+
+The second argument is the input field DOM element. You can get the jQuery object by
+simply calling ``var $element = $(element);`` inside your function.
 
 So, you can replace the default callback by doing two things:
 
-- change the Widget's ``autocomplete_function`` attribute,
-- add a callback for the ``autocompleteLightInitialize`` event for that
-  function,
+- change the Widget's :py:attr:`dal.widgets.WidgetMixin.autocomplete_function` attribute.
+- Register your custom function with ``yl.registerFunction()`` after the ``dal-init-function``
+  event has been called.
 
 Example widget:
 
 .. code-block:: python
 
     class YourWidget(ModelSelect2):
-        autocomplete_function = 'your-autocomplete-function'
+        autocomplete_function = 'your_autocomplete_function'
 
 Example script:
 
 .. code-block:: javascript
 
-    $(document).on(
-        'autocompleteLightInitialize',
-        '[data-autocomplete-light-function=your-autocomplete-function]',
-    function() {
-        // do your own script setup here
+    document.addEventListener('dal-init-function', function () {
+        yl.registerFunction( 'your_autocomplete_function', function ($, element) {
+            var $element = $(element);
+            // autocomplete function here
+        });
     })
 
 Creation of new choices in the autocomplete form
@@ -331,8 +350,8 @@ Creation of new choices in the autocomplete form
 
 - Example source code: `test_project/select2_one_to_one
   <https://github.com/yourlabs/django-autocomplete-light/blob/master/test_project/select2_one_to_one/urls.py>`_,
-- Live demo: `/admin/select2_one_to_one/testmodel/add/
-  <http://dal-yourlabs.rhcloud.com/admin/select2_one_to_one/testmodel/add/>`_,
+- Live demo: `/admin/select2_one_to_one/tmodel/add/
+  <http://dal--jpic.repl.co/admin/select2_one_to_one/tmodel/add/>`_,
 
 The view may provide an extra option when it can't find any result matching the
 user input. That option would have the label ``Create "query"``, where
@@ -377,13 +396,20 @@ explicitly set it with something like:
     permission = Permission.objects.get(name='Can add your-model-name')
     user.user_permissions.add(permission)
 
+Note that the above applies for new objects that only require one field. For more 
+complex objects, `django-addanother <https://github.com/jonashaag/django-addanother>`_ 
+should be considered. With Django Add-Another, a "+" icon is rendered next to the 
+search widget. When clicking this button, an object can be added inside a popup. 
+Once saved, the popup will close and the newly added object will be selected 
+in the widget.
+
 Filtering results based on the value of other fields in the form
 ================================================================
 
 - Example source code: `test_project/linked_data
   <https://github.com/yourlabs/django-autocomplete-light/tree/master/test_project/linked_data>`_.
 - Live demo: `Admin / Linked Data / Add
-  <http://dal-yourlabs.rhcloud.com/admin/linked_data/testmodel/add/>`_.
+  <http://dal--jpic.repl.co/admin/linked_data/tmodel/add/>`_.
 
 In the live demo, create a TestModel with ``owner=None``, and another with
 ``owner=test`` (test being the user you log in with). Then, in in a new form,
@@ -423,7 +449,7 @@ filter as such in the view:
 
     class CountryAutocomplete(autocomplete.Select2QuerySetView):
         def get_queryset(self):
-            if not self.request.user.is_authenticated():
+            if not self.request.user.is_authenticated:
                 return Country.objects.none()
 
             qs = Country.objects.all()
@@ -439,22 +465,22 @@ filter as such in the view:
             return qs
 
 Types of forwarded values
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 There are three possible types of value which you can get from
 ``self.forwarded`` field: boolean, string or list of strings. DAL forward JS
 applies the following rules when figuring out which type to use when you forward
 particular field:
 
- - if there is only one field in the form or subform with given name
-and this field is a checkbox without ``value`` HTML-attribute,
-then a boolean value indicating if this checkbox is checked is forwarded;
- - if there is only one field in the form or subform with given name
-and it has ``multiple`` HTML-attribute, then this field is forwarded as a
-list of strings, containing values from this field.
-- if there are one or more fields in the form with given name and all of
-them are checkboxes with HTML-attribute ``value`` set, then the list of strings
-containing checked checkboxes is forwarded.
+- if there is only one field in the form or subform with given name and this
+  field is a checkbox without ``value`` HTML-attribute, then a boolean value
+  indicating if this checkbox is checked is forwarded;
+- if there is only one field in the form or subform with given name and it has
+  ``multiple`` HTML-attribute, then this field is forwarded as a list of
+  strings, containing values from this field.
+- if there are one or more fields in the form with given name and all of them
+  are checkboxes with HTML-attribute ``value`` set, then the list of strings
+  containing checked checkboxes is forwarded.
 - Otherwise field value forwarded as a string.
 
 Renaming forwarded values
@@ -462,7 +488,7 @@ Renaming forwarded values
 - Example source code: `test_project/rename_forward
   <https://github.com/yourlabs/django-autocomplete-light/tree/master/test_project/rename_forward>`_.
 - Live demo: `Admin / Rename Forward/ Add
-  <http://dal-yourlabs.rhcloud.com/admin/rename_forward/testmodel/add/>`_.
+  <http://dal--jpic.repl.co/admin/rename_forward/tmodel/add/>`_.
 
 Let's assume that you have the following form using linked autocomplete fields:
 
@@ -484,7 +510,7 @@ And the following autocomplete view for country:
 
     class CountryAutocomplete(autocomplete.Select2QuerySetView):
         def get_queryset(self):
-            if not self.request.is_authenticated():
+            if not self.request.is_authenticated:
                 return Country.objects.none()
 
             qs = Country.objects.all()
@@ -560,7 +586,8 @@ Forwarding own selected value
 
 Quite often (especially in multiselect) you may want to exclude value which is
 already selected from autocomplete dropdown. Usually it can be done by
-forwarding a field by name.
+forwarding a field by name. The forward argument expects a tuple,
+so don't forget the trailing comma if the tuple only has one element.
 
 
 .. code-block:: python
@@ -586,7 +613,7 @@ For this special case DAL provides a shortcut named ``Self()``.
             queryset=Country.objects.all(),
             widget=autocomplete.ModelSelect2Multiple(
                 url='country-autocomplete',
-                forward=(forward.Self())
+                forward=(forward.Self(),)
 
 
 In this case the value from ``countries`` will be available from autocomplete
@@ -619,13 +646,13 @@ Then you should add forward declaration to your field as follows:
             queryset=Country.objects.all(),
             widget=autocomplete.ModelSelect2(
                 url='country-autocomplete',
-                forward=(forward.Javascript('my_awesome_handler', 'magic_number'),)))
+                forward=(forward.JavaScript('my_awesome_handler', 'magic_number'),)))
 
 In this case the value returned from your registered handler will be forwarded
 to autocomplete view as ``magic_number``.
 
 Building blocks for custom logic
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+================================
 
 Javascript logic for forwarding field values is a bit sophisticated. In order
 to forward field value DAL searches for the field considering form prefixes and
@@ -635,10 +662,10 @@ to reuse this logic from DAL.
 
 For this purpose DAL provides two JS functions:
 
- - ``getFieldRelativeTo(element, name)`` - get field by ``name`` relative to this
-autocomplete field just like DAL does when forwarding a field.
- - ``getValueFromField(field)`` - get value to forward from ``field`` just like
-DAL does when forwarding a field.
+- ``getFieldRelativeTo(element, name)`` - get field by ``name`` relative to
+  this autocomplete field just like DAL does when forwarding a field.
+- ``getValueFromField(field)`` - get value to forward from ``field`` just like
+  DAL does when forwarding a field.
 
 For the purpose of understanding the logic: you can implement forwarding of
 some standard field by yourself as follows (you probably should never write this
@@ -717,9 +744,40 @@ make it easier to avoid problems when using Select2ListView. For example:
             widget=autocomplete.ListSelect2(url='country-list-autocomplete')
         )
 
-Since the selections in Select2ListView map directly to a list, there is no
-built-in support for choices in a ChoiceField that do not have the same value
-for every text. ``Select2ListCreateChoiceField`` allows you to provide custom
+By default, the selections in Select2ListView can map directly to a list,
+resulting in the same text and value for each option.
+
+To define your own values for each selection, provide a list-of-lists or
+list-of-tuples for the Select2ListView choice_list. For example:
+
+.. code-block:: python
+
+    class CountryAutocompleteFromList(autocomplete.Select2ListView):
+        def get_list(self):
+            return [
+                ['France_value', 'France'],
+                ['Fiji_value', 'Fiji'],
+                ['Finland_value', 'Finland'],
+                ['Switzerland_value', 'Switzerland']
+            ]
+
+
+    def get_choice_list():
+        return [
+            ['France_value', 'France'],
+            ['Fiji_value', 'Fiji'],
+            ['Finland_value', 'Finland'],
+            ['Switzerland_value', 'Switzerland']
+        ]
+
+
+    class CountryForm(forms.ModelForm):
+        country = autocomplete.Select2ListChoiceField(
+            choice_list=get_choice_list,
+            widget=autocomplete.ListSelect2(url='country-list-autocomplete')
+        )
+
+``Select2ListCreateChoiceField`` allows you to provide custom
 text from a Select2List widget and should be used if you define
 ``Select2ListViewAutocomplete.create``.
 
@@ -728,13 +786,36 @@ It is better to use the same source for
 ``Select2ListChoiceField choice_list`` kwarg to avoid unexpected behavior.
 
 
-An opt-group version is available in a similar fashion by inheriting Select2GroupListView :
+An opt-group version is available in a similar fashion by inheriting
+Select2GroupListView. For example:
 
 .. code-block:: python
 
     class CountryAutocompleteFromList(autocomplete.Select2GroupListView):
         def get_list(self):
             return [
+                (None, ['Mars Colony',]),
                 ("Country", ['France', 'Fiji', 'Finland', 'Switzerland'])
+            ]
+
+As with Select2ListView, for opt-groups with specified values, provide a
+list-of-lists or list-of-tuples to the Select2GroupListView get_list method.
+For example:
+
+.. code-block:: python
+
+    class CountryAutocompleteFromList(autocomplete.Select2GroupListView):
+        def get_list(self):
+            return [
+                ([None, None], [['Mars_colony_value', 'Mars Colony']]),
+                (
+                    ['Country_value', 'Country'],
+                    [
+                        ['France_value', 'France'],
+                        ['Fiji_value', 'Fiji'],
+                        ['Finland_value', 'Finland'],
+                        ['Switzerland_value', 'Switzerland']
+                    ]
+                )
             ]
 

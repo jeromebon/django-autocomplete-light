@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 
 import time
 
-from django.utils import six
-
 from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
+
+import six
 
 import tenacity
 
@@ -29,8 +29,8 @@ class BaseStory(object):
         """If any kwarg is None, get it from case attributes."""
         self.case = case
         self.clear_selector = clear_selector or self.case.clear_selector
-        self.dropdown_selector = (dropdown_selector or
-                                  self.case.dropdown_selector)
+        self.dropdown_selector = (dropdown_selector
+                                  or self.case.dropdown_selector)
         self.field_name = field_name or self.case.field_name
         self.input_selector = input_selector or self.case.input_selector
         self.label_selector = label_selector or self.case.label_selector
@@ -66,7 +66,11 @@ class BaseStory(object):
     def clean_label_from_remove_buton(self):
         """Clean child nodes before checking (ie. clear option)."""
         self.case.browser.execute_script(
-            '$("%s *").remove()' % self.get_field_label_selector()
+            '''
+            document.querySelectorAll("%s *").forEach(function(node) {
+                node.parentNode.removeChild(node);
+            });
+            ''' % self.get_field_label_selector()
         )
 
     def get_label(self):
@@ -229,8 +233,8 @@ class InlineSelectOption(SelectOption):
         foreign key used for the InlineModelAdmin.
         """
         self.inline_number = inline_number
-        self.inline_related_name = (inline_related_name or
-                                    case.inline_related_name)
+        self.inline_related_name = (inline_related_name
+                                    or case.inline_related_name)
 
         super(InlineSelectOption, self).__init__(case, **kwargs)
 
@@ -329,7 +333,11 @@ class MultipleMixin(object):
     def clean_label_from_remove_buton(self):
         """Clean child nodes before checking (ie. clear option)."""
         self.case.browser.execute_script(
-            '$("%s span").remove()' % self.get_field_labels_selector()
+            '''
+            document.querySelectorAll("%s span").forEach(function(node) {
+                node.parentNode.removeChild(node);
+            });
+            ''' % self.get_field_labels_selector()
         )
 
     def get_labels(self):
@@ -349,8 +357,8 @@ class MultipleMixin(object):
         """Return the autocomplete field value."""
         script = """
         window.GET_VALUES = [];
-        $('%s option:selected').each(function() {
-            GET_VALUES.push($(this).attr('value'));
+        document.querySelectorAll("%s option:checked").forEach(function(opt) {
+            GET_VALUES.push(opt.value);
         });
         """ % self.field_selector
         self.case.browser.execute_script(script)

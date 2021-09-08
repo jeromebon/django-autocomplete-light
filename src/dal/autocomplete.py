@@ -45,6 +45,7 @@ if _installed('dal_select2'):
     )
     from dal_select2.views import (
         Select2QuerySetView,
+        Select2GroupQuerySetView,
         Select2ListView,
         Select2GroupListView
     )
@@ -57,6 +58,7 @@ if _installed('dal_queryset_sequence'):
     from dal_queryset_sequence.fields import (
         QuerySetSequenceModelField,
         QuerySetSequenceModelMultipleField,
+        GenericForeignKeyModelField,
     )
     from dal_queryset_sequence.views import (
         BaseQuerySetSequenceView,
@@ -70,6 +72,9 @@ if _installed('dal_select2', 'dal_queryset_sequence'):
     from dal_select2_queryset_sequence.widgets import (
         QuerySetSequenceSelect2,
         QuerySetSequenceSelect2Multiple,
+    )
+    from dal_select2_queryset_sequence.fields import (
+        Select2GenericForeignKeyModelField,
     )
 
 if _installed('dal_select2') and _installed('taggit'):
